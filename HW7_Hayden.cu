@@ -25,7 +25,10 @@
 
 /*
  Explain what you did to fix the code:
- 
+ Lines 101, 104, & 105: Added integers col and row to make it easier to find our desired coordinate
+ Lines 109, 112, & 113: Changed the way x, y, and id are calculated to use col and row
+ Lines 135 & 136: Changed blockSize so it is always 16*16 so it's always 256 threads
+ Lines 140 & 141: Changed the way gridSize is found using whatever we define WindowWidth and WindowHeight as
 */
 
 // Include files
