@@ -27,10 +27,11 @@
 
 /*
  Explain what you did to fix the code:
- Line : Changed C_GPU to just c in the function
- Lines : Added this if statement that multiplies the elements of vectors a & b then stores them in c
- Lines : Added this while loop which adds the elements of c together, (finish later before turning in)
- Lines : Added the syncthreads to make sure no threads rush ahead of the others
+ Line 131: Changed C_GPU to just c in the function
+ Lines 136-139: Added this if statement that multiplies the elements of vectors a & b then stores them in c
+ Lines 143-155: Added this while loop which adds the elements of c together, using fold so that more cores are working
+ and not sitting idle
+ Lines 141 & 152: Added the syncthreads to make sure no threads rush ahead of the others
 */
 
 // Include files
