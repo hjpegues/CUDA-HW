@@ -34,7 +34,7 @@
 #include <stdio.h>
 
 // Defines
-#define N 25 // Length of the vector
+#define N 300 // Length of the vector
 
 // Global variables
 float *A_CPU, *B_CPU, *C_CPU; //CPU pointers
@@ -154,7 +154,7 @@ __global__ void dotProductGPU(float *a, float *b, float *c, int n)
 			fold = fold - 1;
 		}
 		fold = fold/2;
-		if(id < fold && (id + fold) < n)
+		if(tid < fold && (tid + fold) < n)
 		{
 			C_Shared[tid] = C_Shared[tid] + C_Shared[tid + fold];
 		}
@@ -238,14 +238,14 @@ int main()
 	gettimeofday(&end, NULL);
 	timeCPU = elaspedTime(start, end);
 	
-	if(BlockSize.x < N)
-	{
-		printf("\n\n Your vector size is larger than the block size.");
-		printf("\n Because we are only using one block this will not work.");
-		printf("\n Good Bye.\n\n");
-		exit(0);
-	}
-	
+	//if(BlockSize.x < N)
+	//{
+		//printf("\n\n Your vector size is larger than the block size.");
+		//printf("\n Because we are only using one block this will not work.");
+		//printf("\n Good Bye.\n\n");
+		//exit(0);
+	//}
+
 	// Adding on the GPU
 	gettimeofday(&start, NULL);
 	
@@ -261,7 +261,11 @@ int main()
 	// Copy Memory from GPU to CPU	
 	cudaMemcpyAsync(C_CPU, C_GPU, GridSize.x*sizeof(float), cudaMemcpyDeviceToHost);
 	cudaErrorCheck(__FILE__, __LINE__);
-	DotGPU = C_CPU[0]; // C_GPU was copied into C_CPU.
+	DotGPU = 0;
+	for(int i = 0; i < GridSize.x; i++)
+	{
+		DotGPU += C_CPU[i];
+	}
 	
 	// Making sure the GPU and CPU wiat until each other are at the same place.
 	cudaDeviceSynchronize();
