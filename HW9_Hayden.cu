@@ -24,9 +24,12 @@
 
 /*
  Explain what you did to fix the code:
- Lines : Defined tid and shared memory variables
- Lines : Added this if statement that loads data into our shared memory
- Lines : 
+ Line 82: Added this to tell us how many blocks we need
+ Lines 132-134: Defined tid and shared memory variables, and changed how id is found
+ Lines 136-143: Added this if statement that loads data into our shared memory
+ Lines 149-163: Changed all c to C_Shared and id to tid
+ Lines 169-172: Loads results into the global memory
+ Lines 268-271: Does the final reduction on the CPU
 */
 
 // Include files
@@ -76,7 +79,7 @@ void setUpDevices()
 	BlockSize.y = 1;
 	BlockSize.z = 1;
 	
-	GridSize.x = (int)((N+1)/BlockSize.x) + 1;
+	GridSize.x = (int)((N+1)/BlockSize.x) + 1; // Tells us how many blocks we need
 	GridSize.y = 1;
 	GridSize.z = 1;
 }
@@ -136,7 +139,7 @@ __global__ void dotProductGPU(float *a, float *b, float *c, int n)
 	}
 	else
 	{
-		C_Shared[tid] = 0.0f; // Fills last block with zeroes if it has less than the defined elements
+		C_Shared[tid] = 0.0f; // Fills last block with zeroes if it has less than 256 elements
 	}
 
 	__syncthreads();
@@ -165,7 +168,7 @@ __global__ void dotProductGPU(float *a, float *b, float *c, int n)
 
 	if(tid == 0)
 	{
-		c[blockIdx.x] = C_Shared[0];
+		c[blockIdx.x] = C_Shared[0]; // Stores result in global memory
 	}
 }
 
@@ -264,7 +267,7 @@ int main()
 	DotGPU = 0;
 	for(int i = 0; i < GridSize.x; i++)
 	{
-		DotGPU += C_CPU[i];
+		DotGPU += C_CPU[i]; // Final reduction on CPU
 	}
 	
 	// Making sure the GPU and CPU wiat until each other are at the same place.
