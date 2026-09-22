@@ -24,7 +24,9 @@
 
 /*
  Explain what you did to fix the code:
- 
+ Lines : Defined tid and shared memory variables
+ Lines : Added this if statement that loads data into our shared memory
+ Lines : 
 */
 
 // Include files
@@ -32,7 +34,7 @@
 #include <stdio.h>
 
 // Defines
-#define N 256 // Length of the vector
+#define N 25 // Length of the vector
 
 // Global variables
 float *A_CPU, *B_CPU, *C_CPU; //CPU pointers
@@ -74,7 +76,7 @@ void setUpDevices()
 	BlockSize.y = 1;
 	BlockSize.z = 1;
 	
-	GridSize.x = 1;
+	GridSize.x = (int)((N+1)/BlockSize.x) + 1;
 	GridSize.y = 1;
 	GridSize.z = 1;
 }
@@ -134,7 +136,7 @@ __global__ void dotProductGPU(float *a, float *b, float *c, int n)
 	}
 	else
 	{
-		C_Shared[tid] = 0.0f;
+		C_Shared[tid] = 0.0f; // Fills last block with zeroes if it has less than the defined elements
 	}
 
 	__syncthreads();
