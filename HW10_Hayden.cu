@@ -48,7 +48,14 @@
 
 /*
  Explain what you did to fix the code:
- 
+ Lines 106-140: Tells us what GPUs we have, their compute capability, and picks the best one
+ Lines 146-151: Checks to make sure our block size is a power of 2
+ Lines 157-169: These make sure our GPU is strong enough to handle the options we chose
+ Line 176: Finds our total number of threads
+ Lines 183-188: These lines allocate memory for GPU arrays
+ Lines 190-195: These zero everything out if we don't fill up every block completely
+ Line 255: atomicadd adds up our partial sums on the GPU
+ Line before gettimeofday: Deleted the loop that sums on CPU since we're using atomicadd
 */
 
 // Include files
@@ -136,7 +143,7 @@ void setUpDevices()
 	BlockSize.y = 1;
 	BlockSize.z = 1;
 	
-	if(BLOCK_SIZE > 0 && (BLOCK_SIZE & (BLOCK_SIZE -1)) != 0)
+	if(BLOCK_SIZE > 0 && (BLOCK_SIZE & (BLOCK_SIZE -1)) != 0) //Power of 2 checker
 	{
 		printf("Your number of threads needs to be a power of 2.\n");
 		printf("Please go fix that.\n");
@@ -147,7 +154,7 @@ void setUpDevices()
 	GridSize.y = 1;
 	GridSize.z = 1;
 
-	if(prop[bestGPU].maxThreadsPerBlock < BLOCK_SIZE)
+	if(prop[bestGPU].maxThreadsPerBlock < BLOCK_SIZE) //These make sure our hardware is good enough
 	{
 		printf("Too many threads per block for this GPU.\n");
 		printf("Please adjust thread count or upgrade GPU (not sponsored).\n");
@@ -166,22 +173,21 @@ void setUpDevices()
 // Allocating the memory we will be using.
 void allocateMemory()
 {	
-	int elements = GridSize.x * BlockSize.x;
+	int elements = GridSize.x * BlockSize.x; //finds number of threads in the grid
 
 	// Host "CPU" memory.				
 	A_CPU = (float*)malloc(N*sizeof(float));
 	B_CPU = (float*)malloc(N*sizeof(float));
 	C_CPU = (float*)malloc(N*sizeof(float));
 	
-	cudaMalloc(&A_GPU, elements*sizeof(float));
+	cudaMalloc(&A_GPU, elements*sizeof(float)); //allocates GPU arrays
     cudaErrorCheck(__FILE__, __LINE__);
     cudaMalloc(&B_GPU, elements*sizeof(float));
     cudaErrorCheck(__FILE__, __LINE__);
     cudaMalloc(&C_GPU, sizeof(float));   // single accumulator
     cudaErrorCheck(__FILE__, __LINE__);
 
-    // zero everything (padding + accumulator)
-    cudaMemset(A_GPU, 0, elements*sizeof(float));
+    cudaMemset(A_GPU, 0, elements*sizeof(float)); //zeros everything
     cudaErrorCheck(__FILE__, __LINE__);
     cudaMemset(B_GPU, 0, elements*sizeof(float));
     cudaErrorCheck(__FILE__, __LINE__);
