@@ -1,6 +1,6 @@
 // Name: Hayden Pegues
 // Ray tracing
-// nvcc HW11_Hayden.cu -o HW11 -lglut -lGL -lm
+// nvcc HW13_Hayden.cu -o HW13 -lglut -lGL -lm
 
 /*
  What to do:
