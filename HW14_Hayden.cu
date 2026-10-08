@@ -22,7 +22,10 @@
 
 /*
  Explain what you did to fix the code:
- 
+ Line 86: Changed BlockSize.x to twice the multiprocessor count
+ Lines 185-194: Defined some variables for our GPU kernel, then zeroed out tid
+ Lines 197-207: Used an if statement to find our bin size, then adds it up in shared memory
+ Lines 210-213: Use another if statement to add everything up into global memory
 */
 
 // Include files
