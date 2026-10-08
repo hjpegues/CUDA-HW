@@ -80,7 +80,7 @@ void SetUpCudaDevices()
 	cudaGetDeviceProperties(&prop, 0);
 	cudaErrorCheck(__FILE__, __LINE__);
 	
-	BlockSize.x = 222;
+	BlockSize.x = 2 * prop.multiProcessorCount;
 	if(prop.maxThreadsDim[0] < BlockSize.x)
 	{
 		printf("\n You are trying to create more threads (%d) than your GPU can support on a block (%d).\n Good Bye\n", BlockSize.x, prop.maxThreadsDim[0]);
