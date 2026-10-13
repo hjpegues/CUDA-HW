@@ -15,7 +15,11 @@
 
 /*
  Explain what you did to fix the code:
- 
+ Line 81: Added this line to allocate page locked memory on the CPU
+ Line 91: Clears up our page locked memory
+ Line 124: Copies our page locked memory up
+ Line 133: Copies our page locked memory down
+ Line 184: Fixed the typo here that wouldn't let the code run
 */
 
 // Include files
