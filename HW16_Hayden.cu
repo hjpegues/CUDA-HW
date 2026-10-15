@@ -14,7 +14,10 @@
 
 /*
  Explain what you did to fix the code:
- 
+ Lines 190 & 191: Copy A up to the GPU
+ Lines 193 & 194: Copy B up to the GPU
+ Lines 196 & 197: Launch the kernel on the stream
+ Lines 199 & 200: Copy the result C back down to the CPU 
 */
 
 // Include files
@@ -184,19 +187,15 @@ int main()
 	
 	for(int i = 0; i < ENTIRE_DATA_SET; i += DATA_CHUNKS)
 	{
-		// Copy this chunk of A up to the GPU (async, on the stream)
     cudaMemcpyAsync(A_GPU, A_CPU + i, DATA_CHUNKS*sizeof(float), cudaMemcpyHostToDevice, Stream0);
     cudaErrorCheck(__FILE__, __LINE__);
 
-    // Copy this chunk of B up to the GPU (async, on the stream)
     cudaMemcpyAsync(B_GPU, B_CPU + i, DATA_CHUNKS*sizeof(float), cudaMemcpyHostToDevice, Stream0);
     cudaErrorCheck(__FILE__, __LINE__);
 
-    // Launch the kernel on the stream
     trigAdditionGPU<<<GridSize, BlockSize, 0, Stream0>>>(A_GPU, B_GPU, C_GPU, DATA_CHUNKS);
     cudaErrorCheck(__FILE__, __LINE__);
 
-    // Copy this chunk of the result C back down to the CPU (async, on the stream)
     cudaMemcpyAsync(C_CPU + i, C_GPU, DATA_CHUNKS*sizeof(float), cudaMemcpyDeviceToHost, Stream0);
     cudaErrorCheck(__FILE__, __LINE__);
 	}
