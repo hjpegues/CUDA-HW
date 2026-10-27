@@ -22,7 +22,13 @@
 
 /*
  Explain what you did to fix the code:
- 
+ Lines 54 & 55: Added two packages so we can use curand
+ Lines 58: Pound-defined number of walks
+ Line 67: Added the prototype for our randomWalk function
+ Lines 77-102: The actual function, uses an if loop to make sure we don't write in too many threads and a for loop
+		 to iterate through however many steps we define, then writes results into unified memory
+ Lines 119-145: Replaced the old stuff in main; added out unified memory using cudaMallocManaged, created a seed for our
+		 cudarand, and printed out our arrays
 */
 
 /*
