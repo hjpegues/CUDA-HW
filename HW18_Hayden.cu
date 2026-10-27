@@ -117,15 +117,14 @@ int main(int argc, char** argv)
     cudaMallocManaged(&positionX, walk_number * sizeof(int));
     cudaMallocManaged(&positionY, walk_number * sizeof(int));
 
-    // Use the current time as a base seed; each walk offsets this by its id.
+    // Use the current time as a base seed
     unsigned long long baseSeed = (unsigned long long)time(NULL);
 
-    // Launch one thread per walk (20 total).
+    // Launch one thread per walk
     int threadsPerBlock = walk_number;
     int blocks = 1;
     randomWalk<<<blocks, threadsPerBlock>>>(positionX, positionY, NumberOfRandomSteps, baseSeed);
 
-    // Wait for the GPU to finish before reading the unified memory.
     cudaDeviceSynchronize();
 
     printf("\n Final positions for %d random walks (%d steps each):\n", walk_number, NumberOfRandomSteps);
