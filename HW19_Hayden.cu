@@ -29,7 +29,16 @@
 
 /*
  Explain what you did to fix the code:
- 
+ In Global Variables: Added new pointers to both my GPU's, two gridsizes for the GPU's, and two ints for the
+					  number of elements handled by each GPU
+ In setUpDevices: Added a loop to print out what GPU's are in your machine, added an if statement to make sure
+				  you have at least 2 GPU's, calculate how many elements are used by each GPU, and set the grid
+				  size for each GPU
+ In allocateMemory: Use cudaSetDevice and cudaMalloc to allocate the amount of memory a GPU needs depending on
+					how many elements are in halfN and secondN
+ Inside main: Use cudaSetDevice and add the first half of the vector on GPU_0, then cudaMemcpy it into the first
+			  half of C_GPU. Do the same thing for GPU_1. Use cudaDeviceSynchroninze on both.
+ In cleanUp: Free up the memory on both our GPU's
 */
 
 // Include files
