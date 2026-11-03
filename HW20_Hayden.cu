@@ -17,6 +17,19 @@
 
 /*
  Explain what you did to fix the code:
+ In the defines: Defined NUMBER_OF_SPHERES, currently set at 25
+ In Global Variable: Changed the original variables to be arrays instead of floats, and added three new ones
+  					 that I use in later functions
+ Defined three new function prototypes: one for a random number, one that let us use the keyboard, and one
+										that kills the program with escape
+ Inside setInitailConditions: Checks proposed placement against where the other spheres are so they aren't 
+							  placed on top of each other, adds a fail condition in case the box gets too
+							  crowded so the loop doesn't run forever, gives every sphere a state, and 
+							  assigns a color using randomBetween
+ Functions draw_picture, keep_in_box, get_forces, and move_bodies now loop over all spheres
+ Function nbody no longer does anything, commented it out
+ User Friendliness: You can now hit escape to kill the program, color randomNumber only runs from 0.3-1.0
+					to avoid colors that are too dark.
  
 */
 
