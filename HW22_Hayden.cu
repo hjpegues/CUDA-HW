@@ -19,7 +19,12 @@
 
 /*
  Explain what you did to fix the code:
- 
+ Under Defines: Added a #define for block size
+ Inside Setup: Changed how our block and grid size are calculated depending on how many we need
+ Split leapfrog into two seperate functions, getForces and moveBodies since _syncthreads() only works in a single block
+ getForces calculates the forces of the bodies in each block at the same time
+ moveBodies is the second half of leapfrog, actually advances the simulation only after getforces has finished
+ Inside main: Added an if statement to the else loop to check that N is at least 1
 */
 
 // Include files
@@ -379,8 +384,6 @@ __global__ void getForces(float3 *p, float3 *f, float *m, float g, float h, int 
     }
 }
 
-// Kernel 2: every thread leap-frogs its own body.
-// This being a separate kernel launch is the grid-wide barrier that __syncthreads() could not give us.
 __global__ void moveBodies(float3 *p, float3 *v, float3 *f, float *m, float damp, float dt, float t, int n)
 {
     int i = threadIdx.x + blockIdx.x*blockDim.x;
