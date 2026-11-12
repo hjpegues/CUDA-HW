@@ -17,6 +17,16 @@
 
 /*
  Explain what you did to fix the code:
+ Under Defines: Defined the number of GPUs
+ Under Globals: Edited the GPU pointers so that they're arrays of NUM_GPU size, also added two more variables
+ Under Function Prototypes: Defined three new function prototypes
+ Inside setUpDevices: This makes sure we have enough devices, tells the GPUs how much they're doing, and calculates block and grid size
+ Inside copyPositionsToHost: Makes the normal position array using the slices from the GPUs
+ Inside exchangePositions: Makes the GPUs see the updated positions of every body
+ Inside drawPicture: Replaces the cudaMemcpy with copyPositionToHost
+ Inside Setup: Calls setupDevices instead of calculating block and grid size itself
+ Inside getForces and moveBodies: If statements go through offset + n now
+ Inside nBody: Iterate through both GPUs when calculating forces and position
  
 */
 
@@ -69,7 +79,6 @@ __global__ void getForces(float3 *, float3 *, float3 *, float *, float, float, i
 __global__ void moveBodies(float3 *, float3 *, float3 *, float *, float, float, float, int, int);
 void nBody();
 int main(int, char**);
-void cleanUp();
 
 void cudaErrorCheck(const char *file, int line)
 {
@@ -383,19 +392,6 @@ void nBody()
     printf("\n Run time on %d GPUs = %.3f milliseconds.\n", NUM_GPU, time/1000.0);
 }
 
-void cleanUp()
-{
-    for(int dev = 0; dev < NUM_GPU; dev++)
-    {
-        cudaSetDevice(dev);
-        cudaFree(PGPU[dev]);
-        cudaFree(VGPU[dev]);
-        cudaFree(FGPU[dev]);
-        cudaFree(MGPU[dev]);
-    }
-    free(P); free(V); free(F); free(M);
-}
-
 int main(int argc, char** argv)
 {
 	setup();
@@ -445,7 +441,6 @@ int main(int argc, char** argv)
     
     glutMainLoop();
     
-    cleanUp();
     return 0;
 }
 
