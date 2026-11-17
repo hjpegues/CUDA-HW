@@ -18,7 +18,15 @@
 
 /*
  Explain what you did to fix the code:
- 
+ Under Globals: Deleted the GPU pointer arrays because they are unnecessary
+ Under Prototype Functions: Added a few new function prototypes
+ sliceCount: Prevents us from accidentally fetching past the end of P
+ setupGPUS: Counts GPUs, checcks they meet the right requirements, and sets up peer access
+ prefetchAll: Gives the initial conditions to the right GPU before launch
+ prefetchPositions: Each GPU pulls down its own slice before launch
+ syncAllGpus: Self explanatory
+ Inside nBody: The loop now calls prefetchPositions and syncGpu instead of doing it all in function,
+			   and it no longer needs to cudaMemCpy memory between GPUs
 */
 
 // Include files
@@ -61,7 +69,6 @@ dim3 GridSize;
 void cudaErrorCheck(const char *, int);
 int  sliceCount(int);
 void setupGpus();
-void adviseMemory();
 void prefetchAll();
 void prefetchPositions();
 void syncAllGpus();
@@ -137,42 +144,6 @@ void setupGpus()
         }
     }
     cudaSetDevice(0);
-    cudaErrorCheck(__FILE__, __LINE__);
-}
-
-// Pin the layout: every GPU keeps its own slice, and everybody (plus the CPU) gets a mapping
-// to all of P because getForces needs all N positions.
-void adviseMemory()
-{
-    if(ConcurrentManagedAccess == 0) return;
-
-    for(int i = 0; i < NumberOfGpus; i++)
-    {
-        int count  = sliceCount(i);
-        if(count == 0) continue;
-        int offset = NPerGPU*i;
-
-        cudaMemAdvise(&P[offset], count*sizeof(float3), cudaMemAdviseSetPreferredLocation, i);
-        cudaErrorCheck(__FILE__, __LINE__);
-        cudaMemAdvise(&V[offset], count*sizeof(float3), cudaMemAdviseSetPreferredLocation, i);
-        cudaErrorCheck(__FILE__, __LINE__);
-        cudaMemAdvise(&F[offset], count*sizeof(float3), cudaMemAdviseSetPreferredLocation, i);
-        cudaErrorCheck(__FILE__, __LINE__);
-        cudaMemAdvise(&M[offset], count*sizeof(float),  cudaMemAdviseSetPreferredLocation, i);
-        cudaErrorCheck(__FILE__, __LINE__);
-    }
-
-    // Positions and masses are read by every GPU, so map them everywhere.
-    for(int i = 0; i < NumberOfGpus; i++)
-    {
-        cudaMemAdvise(P, N*sizeof(float3), cudaMemAdviseSetAccessedBy, i);
-        cudaErrorCheck(__FILE__, __LINE__);
-        cudaMemAdvise(M, N*sizeof(float),  cudaMemAdviseSetAccessedBy, i);
-        cudaErrorCheck(__FILE__, __LINE__);
-    }
-
-    // drawPicture reads P on the host; map it so those reads do not drag pages off the GPUs.
-    cudaMemAdvise(P, N*sizeof(float3), cudaMemAdviseSetAccessedBy, cudaCpuDeviceId);
     cudaErrorCheck(__FILE__, __LINE__);
 }
 
@@ -339,7 +310,6 @@ void setup()
     }
 
     // Hint the layout, then push everything to the GPU that owns it before the first kernel runs.
-    adviseMemory();
     prefetchAll();
 
     printf("\n Setup finished.\n");
