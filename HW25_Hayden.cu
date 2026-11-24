@@ -31,9 +31,10 @@
 /*
  Explain what you did to fix the code:
  Added the package and necessary code lines, but it said I didn't have permission or something
- Inside Defines: Changed BLOCK_SIZE and DRAW_RATE (I don't see a rule against this)
+ Inside Defines: Changed BLOCK_SIZE and DRAW_RATE (I don't know if you'll make everyone use the 
+				 same draw rate, so I thought I'd give it a shot)
  Inside Function Prototypes: Added the check prototype and modified getForces and moveBodies
- 
+ Inside of getForces: 
 */
 
 // Include files
