@@ -32,9 +32,15 @@
  Explain what you did to fix the code:
  Added the package and necessary code lines, but it said I didn't have permission or something
  Inside Defines: Changed BLOCK_SIZE and DRAW_RATE (I don't know if you'll make everyone use the 
-				 same draw rate, so I thought I'd give it a shot)
- Inside Function Prototypes: Added the check prototype and modified getForces and moveBodies
- Inside of getForces: 
+				 same draw rate, so I thought I'd give it a shot).
+ Inside Function Prototypes: Added the check prototype and modified getForces and moveBodies.
+ Inside Setup: Changed how grid size is calculated, since we know N is always divisible by two.
+ Inside of getForces: Added the shared memory tile loop, changed how we load some values, changed 
+					  how the math is done to be more efficient, added pragma unroll.
+ Inside moveBodies: Added the __restrict__ so the compiler can use the read only cache, it now 
+					loads our movement variables once and writes back v & p back once, we now 
+					only have one cudaErrorCheck at the end of the loop instead of checking
+					multiple times.
 */
 
 // Include files
